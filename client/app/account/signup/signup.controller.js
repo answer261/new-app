@@ -1,24 +1,24 @@
 'use strict';
 
-angular.module('ePlanApp')
-  .controller('SignupCtrl', function ($scope, Auth, $location, $window) {
+angular.module('newAppApp')
+  .controller('SignupCtrl', function($scope, Auth, $state) {
     $scope.user = {};
     $scope.errors = {};
 
     $scope.register = function(form) {
       $scope.submitted = true;
 
-      if(form.$valid) {
+      if (form.$valid) {
         Auth.createUser({
           name: $scope.user.name,
           email: $scope.user.email,
           password: $scope.user.password
         })
-        .then( function() {
+        .then(function() {
           // Account created, redirect to home
-          $location.path('/');
+          $state.go('main');
         })
-        .catch( function(err) {
+        .catch(function(err) {
           err = err.data;
           $scope.errors = {};
 
@@ -31,7 +31,4 @@ angular.module('ePlanApp')
       }
     };
 
-    $scope.loginOauth = function(provider) {
-      $window.location.href = '/auth/' + provider;
-    };
   });

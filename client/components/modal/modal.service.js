@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('ePlanApp')
+angular.module('newAppApp')
   .factory('Modal', function ($rootScope, $modal) {
     /**
      * Opens a modal

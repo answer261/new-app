@@ -3,7 +3,7 @@
 /**
  * Removes server error when user updates input
  */
-angular.module('ePlanApp')
+angular.module('newAppApp')
   .directive('mongooseError', function () {
     return {
       restrict: 'A',
