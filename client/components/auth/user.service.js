@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('newAppApp')
+angular.module('ePlanApp')
   .factory('User', function ($resource) {
     return $resource('/api/users/:id/:controller', {
       id: '@_id'
@@ -18,5 +18,5 @@ angular.module('newAppApp')
           id:'me'
         }
       }
-    });
+	  });
   });

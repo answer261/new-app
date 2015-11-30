@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('newAppApp')
-  .config(function($stateProvider) {
+angular.module('ePlanApp')
+  .config(function ($stateProvider) {
     $stateProvider
       .state('admin', {
         url: '/admin',

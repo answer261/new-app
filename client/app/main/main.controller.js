@@ -1,33 +1,27 @@
 'use strict';
-(function() {
 
-function MainController($scope, $http, socket) {
-  var self = this;
-  this.awesomeThings = [];
+angular.module('ePlanApp')
+  .controller('MainCtrl', function ($scope, $http, socket) {
+    $scope.awesomeThings = [];
 
-  $http.get('/api/things').then(function(response) {
-    self.awesomeThings = response.data;
-    socket.syncUpdates('thing', self.awesomeThings);
+    $http.get('/api/things').success(function(awesomeThings) {
+      $scope.awesomeThings = awesomeThings;
+      socket.syncUpdates('thing', $scope.awesomeThings);
+    });
+
+    $scope.addThing = function() {
+      if($scope.newThing === '') {
+        return;
+      }
+      $http.post('/api/things', { name: $scope.newThing });
+      $scope.newThing = '';
+    };
+
+    $scope.deleteThing = function(thing) {
+      $http.delete('/api/things/' + thing._id);
+    };
+
+    $scope.$on('$destroy', function () {
+      socket.unsyncUpdates('thing');
+    });
   });
-
-  this.addThing = function() {
-    if (self.newThing === '') {
-      return;
-    }
-    $http.post('/api/things', { name: self.newThing });
-    self.newThing = '';
-  };
-
-  this.deleteThing = function(thing) {
-    $http.delete('/api/things/' + thing._id);
-  };
-
-  $scope.$on('$destroy', function() {
-    socket.unsyncUpdates('thing');
-  });
-}
-
-angular.module('newAppApp')
-  .controller('MainController', MainController);
-
-})();

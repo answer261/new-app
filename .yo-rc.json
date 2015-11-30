@@ -1,7 +1,5 @@
 {
   "generator-angular-fullstack": {
-    "generatorVersion": "3.0.0-rc8",
-    "endpointDirectory": "server/api/",
     "insertRoutes": true,
     "registerRoutesFile": "server/routes.js",
     "routesNeedle": "// Insert routes below",
@@ -10,10 +8,8 @@
     "insertSockets": true,
     "registerSocketsFile": "server/config/socketio.js",
     "socketsNeedle": "// Insert sockets below",
-    "insertModels": true,
-    "registerModelsFile": "server/sqldb/index.js",
-    "modelsNeedle": "// Insert models below",
     "filters": {
+      "babel": false,
       "js": true,
       "html": true,
       "less": true,
@@ -21,19 +17,12 @@
       "bootstrap": true,
       "uibootstrap": true,
       "socketio": true,
-      "auth": true,
-      "models": true,
-      "mongooseModels": true,
       "mongoose": true,
+      "auth": true,
       "oauth": true,
       "googleAuth": true,
       "facebookAuth": true,
-      "twitterAuth": true,
-      "grunt": true,
-      "jasmine": true,
-      "mocha": false,
-      "should": false,
-      "expect": false
+      "twitterAuth": true
     }
   },
   "generator-ng-component": {
@@ -44,8 +33,6 @@
     "basePath": "client",
     "moduleName": "",
     "filters": [
-      "uirouter",
-      "jasmine",
       "uirouter"
     ],
     "extensions": [

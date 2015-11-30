@@ -1,8 +1,9 @@
 'use strict';
 
-import express from 'express';
-import controller from './user.controller';
-import auth from '../../auth/auth.service';
+var express = require('express');
+var controller = require('./user.controller');
+var config = require('../../config/environment');
+var auth = require('../../auth/auth.service');
 
 var router = express.Router();
 

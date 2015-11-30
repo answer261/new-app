@@ -1,12 +1,11 @@
 'use strict';
 
-angular.module('newAppApp')
-  .config(function($stateProvider) {
+angular.module('ePlanApp')
+  .config(function ($stateProvider) {
     $stateProvider
       .state('main', {
         url: '/',
         templateUrl: 'app/main/main.html',
-        controller: 'MainController',
-        controllerAs: 'main'
+        controller: 'MainCtrl'
       });
   });

@@ -1,76 +1,50 @@
 'use strict';
 
-import User from './user.model';
-import passport from 'passport';
-import config from '../../config/environment';
-import jwt from 'jsonwebtoken';
+var User = require('./user.model');
+var passport = require('passport');
+var config = require('../../config/environment');
+var jwt = require('jsonwebtoken');
 
-function validationError(res, statusCode) {
-  statusCode = statusCode || 422;
-  return function(err) {
-    res.status(statusCode).json(err);
-  }
-}
-
-function handleError(res, statusCode) {
-  statusCode = statusCode || 500;
-  return function(err) {
-    res.status(statusCode).send(err);
-  };
-}
-
-function respondWith(res, statusCode) {
-  statusCode = statusCode || 200;
-  return function() {
-    res.status(statusCode).end();
-  };
-}
+var validationError = function(res, err) {
+  return res.status(422).json(err);
+};
 
 /**
  * Get list of users
  * restriction: 'admin'
  */
 exports.index = function(req, res) {
-  User.findAsync({}, '-salt -hashedPassword')
-    .then(function(users) {
-      res.status(200).json(users);
-    })
-    .catch(handleError(res));
+  User.find({}, '-salt -hashedPassword', function (err, users) {
+    if(err) return res.status(500).send(err);
+    res.status(200).json(users);
+  });
 };
 
 /**
  * Creates a new user
  */
-exports.create = function(req, res, next) {
+exports.create = function (req, res, next) {
   var newUser = new User(req.body);
   newUser.provider = 'local';
   newUser.role = 'user';
-  newUser.saveAsync()
-    .spread(function(user) {
-      var token = jwt.sign({ _id: user._id }, config.secrets.session, {
-        expiresInMinutes: 60 * 5
-      });
-      res.json({ token: token });
-    })
-    .catch(validationError(res));
+  newUser.save(function(err, user) {
+    if (err) return validationError(res, err);
+    var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresInMinutes: 60*5 });
+    res.json({ token: token });
+  });
 };
 
 /**
  * Get a single user
  */
-exports.show = function(req, res, next) {
+exports.show = function (req, res, next) {
   var userId = req.params.id;
 
-  User.findByIdAsync(userId)
-    .then(function(user) {
-      if (!user) {
-        return res.status(404).end();
-      }
-      res.json(user.profile);
-    })
-    .catch(function(err) {
-      return next(err);
-    });
+  User.findById(userId, function (err, user) {
+    if (err) return next(err);
+    if (!user) return res.status(401).send('Unauthorized');
+    res.json(user.profile);
+  });
 };
 
 /**
@@ -78,11 +52,10 @@ exports.show = function(req, res, next) {
  * restriction: 'admin'
  */
 exports.destroy = function(req, res) {
-  User.findByIdAndRemoveAsync(req.params.id)
-    .then(function() {
-      res.status(204).end();
-    })
-    .catch(handleError(res));
+  User.findByIdAndRemove(req.params.id, function(err, user) {
+    if(err) return res.status(500).send(err);
+    return res.status(204).send('No Content');
+  });
 };
 
 /**
@@ -93,19 +66,17 @@ exports.changePassword = function(req, res, next) {
   var oldPass = String(req.body.oldPassword);
   var newPass = String(req.body.newPassword);
 
-  User.findByIdAsync(userId)
-    .then(function(user) {
-      if (user.authenticate(oldPass)) {
-        user.password = newPass;
-        return user.saveAsync()
-          .then(function() {
-            res.status(204).end();
-          })
-          .catch(validationError(res));
-      } else {
-        return res.status(403).end();
-      }
-    });
+  User.findById(userId, function (err, user) {
+    if(user.authenticate(oldPass)) {
+      user.password = newPass;
+      user.save(function(err) {
+        if (err) return validationError(res, err);
+        res.status(200).send('OK');
+      });
+    } else {
+      res.status(403).send('Forbidden');
+    }
+  });
 };
 
 /**
@@ -113,17 +84,13 @@ exports.changePassword = function(req, res, next) {
  */
 exports.me = function(req, res, next) {
   var userId = req.user._id;
-
-  User.findOneAsync({ _id: userId }, '-salt -hashedPassword')
-    .then(function(user) { // don't ever give out the password or salt
-      if (!user) {
-        return res.status(401).end();
-      }
-      res.json(user);
-    })
-    .catch(function(err) {
-      return next(err);
-    });
+  User.findOne({
+    _id: userId
+  }, '-salt -hashedPassword', function(err, user) { // don't ever give out the password or salt
+    if (err) return next(err);
+    if (!user) return res.status(401).send('Unauthorized');
+    res.json(user);
+  });
 };
 
 /**
